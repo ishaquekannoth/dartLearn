@@ -1,27 +1,22 @@
 void main() async {
-  Stream<double> getAllAges() async* {
-    for (int i = 1; i <= 10; i++) {
-      await Future.delayed(Duration(microseconds: 1));
-      yield i * 10;
+  bool isEven(int x) => x % 2 == 0;
+  bool isOdd(int x) => x % 2 != 0;
+  Stream<int> numberStream(
+      {int start = 1, int end = 5, Function(int)? isIncluded}) async* {
+    for (int i = start; i <= end; i++) {
+      if (isIncluded == null || isIncluded(i)) {
+        yield i;
+      }
     }
   }
 
-  double add(double a, double b) => a + b;
-
-  Stream<String> getNames() async* {
-    await Future.delayed(Duration(seconds: 1));
-    yield "John";
-    await Future.delayed(Duration(seconds: 1));
-    yield "Jack";
-    await Future.delayed(Duration(seconds: 1));
-    yield "Ishaque";
+  await for (int value in numberStream(isIncluded: isEven)) {
+    print(value);
   }
-
-  final result = await getAllAges().reduce((pre, curr) {
-    print("Previous is $pre");
-    print("Current is $curr");
-    print("Iteration done");
-    return add(pre / 10, curr / 10);
-  });
-  print(result);
+  await for (int value in numberStream(isIncluded: isOdd)) {
+    print(value);
+  }
+  await for (int value in numberStream()) {
+    print(value);
+  }
 }
