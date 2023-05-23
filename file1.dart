@@ -1,22 +1,27 @@
 void main() async {
-  bool isEven(int x) => x % 2 == 0;
-  bool isOdd(int x) => x % 2 != 0;
-  Stream<int> numberStream(
-      {int start = 1, int end = 5, Function(int)? isIncluded}) async* {
-    for (int i = start; i <= end; i++) {
-      if (isIncluded == null || isIncluded(i)) {
-        yield i;
-      }
-    }
+  Stream<String> maleNames() async* {
+    yield "Ishaque";
+    await Future.delayed(Duration(seconds: 1));
+    yield "Irfan";
+    await Future.delayed(Duration(seconds: 1));
+    yield "Ihsan";
   }
 
-  await for (int value in numberStream(isIncluded: isEven)) {
-    print(value);
+  Stream<String> femaleNames() async* {
+    yield "Imana";
+    await Future.delayed(Duration(seconds: 1));
+    yield "Inaya";
+    await Future.delayed(Duration(seconds: 1));
+    yield "Iqra";
   }
-  await for (int value in numberStream(isIncluded: isOdd)) {
-    print(value);
+
+  Stream<String> allNames() async* {
+    yield* maleNames();
+    await Future.delayed(Duration(seconds: 3));
+    yield* femaleNames();
   }
-  await for (int value in numberStream()) {
-    print(value);
+
+  await for (String name in allNames()) {
+    print(name);
   }
 }
