@@ -1,27 +1,44 @@
 import 'dart:async';
 
 void main() async {
-  Future<List<String>> extractCharactors(String word) async {
-    final charactors = <String>[];
+  Future<void> nonBroadCastStreamExample() async {
+    final controller = StreamController<String>();
+    controller.sink.add("Ishaque");
+    controller.sink.add("Bill Gates");
+    controller.sink.add("Elon Musk");
 
-    for (String char in word.split("")) {
-      await Future.delayed(
-          Duration(microseconds: 100), () => charactors.add(char));
+    try {
+      await for (var name in controller.stream) {
+        print(name);
+        await for (var name in controller.stream) {
+          print(name);
+        }
+      }
+    } catch (e) {
+      print(e);
     }
-    return charactors;
   }
 
-  Stream<String> getNames() async* {
-    yield "Ishaque";
-    yield "Bill Gates";
-    yield "Elon Musk";
+  Future<void> broadCastStreamExample() async {
+    final controller = StreamController<String>.broadcast();
+
+    final sub1 = controller.stream.listen((event) {
+      print("sub1: $event");
+    });
+    final sub2 = controller.stream.listen((event) {
+      print("sub2: $event");
+    });
+    controller.sink.add("Ishaque");
+    controller.sink.add("Bill Gates");
+    controller.sink.add("Elon Musk");
+    controller.close();
+    controller.onCancel = () {
+      print("on cancel called");
+      sub1.cancel();
+      sub2.cancel();
+    };
   }
 
-  Stream<String> repeatThrice(String value) {
-    return Stream.fromIterable(Iterable.generate(3, (_) => value));
-  }
-
-  await for(String name in getNames().asyncExpand((event) => repeatThrice(event))) {
-    print(name);
-  }
+  await nonBroadCastStreamExample();
+  await broadCastStreamExample();
 }
