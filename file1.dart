@@ -1,54 +1,46 @@
 import 'dart:async';
 
 void main() async {
-  List<String> name = [
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N"
-  ];
+  Stream<String> getNames() async* {
+    yield "Ishaque";
+    yield "Bill Gates";
+    yield "Elon Musk";
+    throw "All out of names";
+  }
 
-  // await for (String name in Stream<String>.fromIterable(name)) {
-  //   print(name.toLowerCase());
-  // }
-
-  // await for (String name in Stream<String>.fromIterable(name)
-  //     .map((event) => event.toUpperCase())) {
-  //   print(name);
-  // }
-
-  await for (String name in Stream<String>.fromIterable(name).capitalised) {
+  await for (String name in getNames().absorbErrUsingHandleError()) {
     print(name);
   }
-  await for (String name
-      in Stream<String>.fromIterable(name).smallCasedUsingMap) {
+  await for (String name in getNames().absorbUsingHandlers()) {
+    print(name);
+  }
+  await for (String name in getNames().absorbUsingTransformer()) {
     print(name);
   }
 }
 
-class ToUpperCase extends StreamTransformerBase<String, String> {
+extension AbsorbErrors<T> on Stream<T> {
+  Stream<T> absorbErrUsingHandleError() => handleError((error, stackTrace) {
+        print("Error occured");
+      });
+  Stream<T> absorbUsingHandlers() => transform(StreamTransformer.fromHandlers(
+        handleError: (error, stackTrace, sink) => sink.close(),
+      ));
+  Stream<T> absorbUsingTransformer() => transform(StreamErrAbsorber());
+}
+
+class StreamErrAbsorber<T> extends StreamTransformerBase<T, T> {
   @override
-  Stream<String> bind(Stream stream) {
-    return stream.map((event) => event.toUpperCase());
-  }
-}
+  Stream<T> bind(Stream<T> stream) {
+    final controller = StreamController<T>();
 
-extension Capitalize on Stream<String> {
-  Stream<String> get capitalised {
-    return this.transform(ToUpperCase());
-  }
-
-  Stream<String> get smallCasedUsingMap {
-    return this.map((event) => event.toLowerCase());
+    stream.listen(
+      (event) {
+        controller.sink.add(event);
+      },
+      onError: (_) {},
+      onDone: () => controller.close(),
+    );
+    return controller.stream;
   }
 }
