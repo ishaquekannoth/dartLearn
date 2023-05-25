@@ -17,11 +17,11 @@ void main() async {
     yield "Elon Musk";
   }
 
-  final result = await getNames()
-      .asyncMap((event) => extractCharactors(event))
-      .fold("", (previous, element) {
-    final elements = element.join("-");
-    return "$previous  $elements";
-  });
-  print(result);
+  Stream<String> repeatThrice(String value) {
+    return Stream.fromIterable(Iterable.generate(3, (_) => value));
+  }
+
+  await for(String name in getNames().asyncExpand((event) => repeatThrice(event))) {
+    print(name);
+  }
 }
