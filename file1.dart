@@ -20,7 +20,7 @@ void main() async {
   }
 
   Future<void> broadCastStreamExample() async {
-    final controller = StreamController<String>.broadcast();
+    final StreamController<String> controller = StreamController<String>.broadcast();
 
     final sub1 = controller.stream.listen((event) {
       print("sub1: $event");
@@ -30,8 +30,11 @@ void main() async {
     });
     controller.sink.add("Ishaque");
     controller.sink.add("Bill Gates");
+    //await Future.delayed(Duration(seconds: 2));
+    //sub1.cancel();
     controller.sink.add("Elon Musk");
     controller.close();
+
     controller.onCancel = () {
       print("on cancel called");
       sub1.cancel();
@@ -39,6 +42,5 @@ void main() async {
     };
   }
 
-  await nonBroadCastStreamExample();
   await broadCastStreamExample();
 }
