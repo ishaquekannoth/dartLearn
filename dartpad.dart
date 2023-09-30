@@ -26,18 +26,12 @@ Future<String> getMessage(String messageToSend) async {
   //1)Awaiting a new spawn by sending the  RecievePort's SendPort
   //2)This is done since the response from the _communicator will be recieved in the
   //sendPort which is the 2nd arguement of the spawn method (which is also inside the RecievePort)
-  //3)isolate.spawn must have 2 postitional argument..
+  //3)isolate.spawn must have 2 postitional argument..Can have any type of return value
   // function(T) and message which is also of same type as T which is the function Parameter type
   //and the same type must be passed in the message parameter
   Isolate.spawn(_communicator, receivePortToRecieveReply.sendPort);
-  //since RP is not of much use with its constructor we are taking the stream out of it.
-  //data sent by _communicator will now be in the RP(since we are sending the send port which is inside the RP)
   final broadCastRp = receivePortToRecieveReply.asBroadcastStream();
-  //we are getting the SP of the _communicator which is a part of its RP,
-  //so that communicator can recieve the message in his RP if we sent in its RP.sp
   final SendPort sendPortCommunicator = await broadCastRp.first;
-  //we need a send port to send the message to the _communicator
-  //we have to use the SP to send  on the sendPortCommunicator which is the part of RP,and they can access through the RP
   sendPortCommunicator.send(messageToSend);
 
   return broadCastRp
@@ -75,3 +69,19 @@ const Map<String, String> messagesAndResponse = {
   "what are you doing": "I am a computer",
   "Are you enjoying life": "Yes,definitely"
 };
+
+
+/*
+consider like this..
+
+GetMessage Method:
+I will give U my send port..Here is it..send your message to this SP...
+I will recieve it in my Recieve port
+I will be listening
+_communicator:
+Ok..I will also make a recievePort and send you my sendPort...
+U will get it in first message..save it and keep it with you or
+Send message to this port..I will keep listening..
+
+*/
+
