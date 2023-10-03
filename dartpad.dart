@@ -19,7 +19,7 @@ void main() async {
 Future<int> runOnIsoloate() async {
   Completer<int> completer = Completer();
   ReceivePort receivePort = ReceivePort();
-  Isolate current = await Isolate.spawn(workerFunction, receivePort.sendPort);
+  await Isolate.spawn(workerFunction, receivePort.sendPort);
   final rp = receivePort.asBroadcastStream(
     onCancel: (subscription) => subscription.cancel(),
   );
@@ -30,9 +30,7 @@ Future<int> runOnIsoloate() async {
     if (message > 100) {
       completer.complete(message);
       subscription?.cancel();
-      current.kill();
     }
-    log(completer.isCompleted.toString());
   });
 
   return completer.future;
