@@ -5,8 +5,11 @@ abstract class MyEvent {
   //factory MyEvent.initialise({required String differentName}) = InitialiseEvent; doesnt work
   factory MyEvent.initialise({required String name}) = InitialiseEvent;
   factory MyEvent.fetchUserData({required String uid}) = FetchTheUserDetails;
-  factory MyEvent.initialiseUsingNamedConstructor({required String name}) =>
-      InitialiseEvent.startIntialising(name: name);
+//for this named constructor in the main class arguments need not to be matched since we are not assigning
+//but we are calling the constructor
+  factory MyEvent.initialiseUsingNamedConstructor(
+          {required String differntName}) =>
+      InitialiseEvent.startIntialising(name: differntName);
   void logTheData();
 }
 
@@ -49,5 +52,6 @@ void doSomething(MyEvent event) {
 void main() {
   doSomething(InitialiseEvent(name: "Ishaque is the name "));
   doSomething(FetchTheUserDetails(uid: "UserID is ish-uid"));
-  doSomething(InitialiseEvent.startIntialising(name: "Used Named Factory Constructor for abstract class"));
+  doSomething(InitialiseEvent.startIntialising(
+      name: "Used Named Factory Constructor for abstract class"));
 }
