@@ -5,6 +5,8 @@ abstract class MyEvent {
   //factory MyEvent.initialise({required String differentName}) = InitialiseEvent; doesnt work
   factory MyEvent.initialise({required String name}) = InitialiseEvent;
   factory MyEvent.fetchUserData({required String uid}) = FetchTheUserDetails;
+  factory MyEvent.initialiseUsingNamedConstructor({required String name}) =>
+      InitialiseEvent.startIntialising(name: name);
   void logTheData();
 }
 
@@ -16,6 +18,9 @@ class InitialiseEvent implements MyEvent {
   String toString() {
     return '{My name is $name}';
   }
+
+  factory InitialiseEvent.startIntialising({required String name}) =>
+      InitialiseEvent(name: name);
 
   @override
   void logTheData() {
@@ -42,6 +47,7 @@ void doSomething(MyEvent event) {
 }
 
 void main() {
-  doSomething(InitialiseEvent(name: "Raju"));
-  doSomething(FetchTheUserDetails(uid: "UserID"));
+  doSomething(InitialiseEvent(name: "Ishaque is the name "));
+  doSomething(FetchTheUserDetails(uid: "UserID is ish-uid"));
+  doSomething(InitialiseEvent.startIntialising(name: "Used Named Factory Constructor for abstract class"));
 }
